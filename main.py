@@ -2,6 +2,8 @@ import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import bigquery
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +24,16 @@ DATASET_ID = 'customer_account'
 TABLE_ID = 'cus_acc'
 TABLE = f"{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}"
 
+
+# Mount static files directory (for serving HTML)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+# Serve static files from the "images" folder
+#app.mount("/static/images", StaticFiles(directory="static/images"), name="images")
+
+# Route to serve HTML page
+@app.get("/")
+async def serve_html():
+    return FileResponse("static/index.html")
 
 # Define the FastAPI route to check account balance
 @app.post("/check-balance/")
